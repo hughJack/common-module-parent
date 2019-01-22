@@ -8,18 +8,18 @@ public class RpcNullException extends RpcException {
 
     private static final long serialVersionUID = 894798122053539233L;
 
-    private static final long DEFAULT_RPC_ARGUMENTS_EXCEPTION_CODE = 900003;
+    public static final long DEFAULT_EXCEPTION_CODE = 900003;
 
     public RpcNullException(String msg) {
-        super(DEFAULT_RPC_ARGUMENTS_EXCEPTION_CODE, msg);
+        super(DEFAULT_EXCEPTION_CODE, msg);
     }
 
     public RpcNullException(String msg, Throwable throwable) {
-        super(DEFAULT_RPC_ARGUMENTS_EXCEPTION_CODE, msg, throwable);
+        super(DEFAULT_EXCEPTION_CODE, msg, throwable);
     }
 
     public RpcNullException(Throwable throwable) {
-        super(DEFAULT_RPC_ARGUMENTS_EXCEPTION_CODE, throwable);
+        super(DEFAULT_EXCEPTION_CODE, throwable);
     }
 
 }

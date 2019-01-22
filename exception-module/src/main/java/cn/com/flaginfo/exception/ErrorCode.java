@@ -357,7 +357,11 @@ public enum ErrorCode {
     /**
      * 推荐交互服务
      */
-    BIZ_COMMEND_SERVICE(600070L,  "biz.commend.service.unavailable");
+    BIZ_COMMEND_SERVICE(600070L,  "biz.commend.service.unavailable"),
+    /**
+     * 推荐统计服务
+     */
+    RECOMMEND_SYSTEM_ESTIMATION(600080L,  "recommend.system.estimation.service.unavailable");
 
 
 

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>common-module</artifactId>
-    <version>6.2.1.RELEASE</version>
+    <version>6.2.3.RELEASE</version>
     <packaging>jar</packaging>
 
     <name>common-module</name>
@@ -29,7 +29,7 @@
     <parent>
         <groupId>cn.com.flaginfo</groupId>
         <artifactId>common-module-parent</artifactId>
-        <version>6.2.1.RELEASE</version>
+        <version>6.2.3.RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>cn.com.flaginfo</groupId>
             <artifactId>exception-module</artifactId>
-            <version>6.2.1.RELEASE</version>
+            <version>6.2.3.RELEASE</version>
         </dependency>
 
         <dependency>

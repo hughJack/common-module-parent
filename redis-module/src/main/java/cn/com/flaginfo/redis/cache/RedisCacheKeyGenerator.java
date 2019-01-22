@@ -1,5 +1,6 @@
 package cn.com.flaginfo.redis.cache;
 
+import cn.com.flaginfo.module.common.reflect.DescriptionCacheFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +69,7 @@ public class RedisCacheKeyGenerator {
             if (obj == null) {
                 return null;
             }
-            obj = BeanUtils.getPropertyDescriptor(obj.getClass(), els[i + 1]);
+            obj = DescriptionCacheFactory.getFieldValueFromObject(els[i + 1], obj );
         }
         return obj;
     }

@@ -2,9 +2,10 @@ package cn.com.flaginfo.rpc.common.utils;
 
 import cn.com.flaginfo.exception.rpc.RpcErrorException;
 import cn.com.flaginfo.exception.rpc.RpcException;
+import cn.com.flaginfo.exception.rpc.RpcNoResponseException;
 import cn.com.flaginfo.exception.rpc.RpcNullException;
 import cn.com.flaginfo.platform.api.common.base.BaseResponse;
-import cn.com.flaginfo.rpc.common.domain.RpcBaseDTO;
+import cn.com.flaginfo.rpc.common.domain.IRpcDTO;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public class RpcResponseUtils {
      * @return
      */
     public static BaseResponse success(){
-        return success(RpcBaseDTO.emptyDTO());
+        return success(IRpcDTO.emptyDTO());
     }
 
     /**
@@ -117,7 +118,7 @@ public class RpcResponseUtils {
      * @return
      * @throws RpcException
      */
-    public static <T> T getResponseData(BaseResponse<T> baseResponse) throws RpcNullException, RpcErrorException {
+    public static <T> T getResponseData(BaseResponse<T> baseResponse) throws RpcNullException, RpcErrorException, RpcNoResponseException {
         return getResponseData(baseResponse, false);
     }
 
@@ -129,12 +130,12 @@ public class RpcResponseUtils {
      * @return
      * @throws RpcException
      */
-    public static <T> T getResponseData(BaseResponse<T> baseResponse, boolean canBeNull) throws RpcNullException, RpcErrorException {
+    public static <T> T getResponseData(BaseResponse<T> baseResponse, boolean canBeNull) throws RpcNullException, RpcErrorException, RpcNoResponseException {
         if( null == baseResponse ){
             if( canBeNull ){
                 return null;
             }
-            throw new RpcNullException("rpc response is null, cannot get data.");
+            throw new RpcNoResponseException("rpc response is null, cannot get data.");
         }
         if( !isSuccess(baseResponse) ){
             if( canBeNull ){

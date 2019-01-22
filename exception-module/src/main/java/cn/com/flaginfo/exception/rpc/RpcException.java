@@ -8,9 +8,9 @@ package cn.com.flaginfo.exception.rpc;
 public class RpcException extends Exception {
 
     private static final long serialVersionUID = 894798122053539231L;
-    
+
     private static final long DEFAULT_EXCEPTION_CODE = 900000;
-    
+
     /**
      * 错误码
      */
