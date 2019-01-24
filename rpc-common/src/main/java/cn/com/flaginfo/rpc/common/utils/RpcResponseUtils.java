@@ -24,7 +24,7 @@ public class RpcResponseUtils {
      * 成功，返回空数据
      * @return
      */
-    public static BaseResponse<?> success(){
+    public static BaseResponse success(){
         return success(IRpcDTO.emptyDTO());
     }
 
@@ -84,7 +84,7 @@ public class RpcResponseUtils {
      * @param message
      * @return
      */
-    public static BaseResponse<?> error(String message){
+    public static BaseResponse error(String message){
         return error(ERROR_CODE, message);
     }
 
@@ -94,7 +94,7 @@ public class RpcResponseUtils {
      * @param message
      * @return
      */
-    public static BaseResponse<?> error(long code, String message){
+    public static BaseResponse error(long code, String message){
         return BaseResponse.error(code, message);
     }
 
@@ -103,7 +103,7 @@ public class RpcResponseUtils {
      * @param baseResponse
      * @return
      */
-    public static boolean isSuccess(BaseResponse<?> baseResponse){
+    public static boolean isSuccess(BaseResponse baseResponse){
         if( null == baseResponse ){
             return false;
         }
