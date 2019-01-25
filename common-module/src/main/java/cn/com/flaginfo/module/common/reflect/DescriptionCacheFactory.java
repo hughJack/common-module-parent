@@ -2,8 +2,11 @@ package cn.com.flaginfo.module.common.reflect;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author: Meng.Liu
@@ -13,6 +16,8 @@ import java.util.Map;
 public class DescriptionCacheFactory {
 
     private transient volatile static Map<String, ClassDescription> classDescriptionMap = Maps.newConcurrentMap();
+
+    private static final Lock LOCK = new ReentrantLock();
 
     /**
      * 获取类描述
@@ -30,7 +35,8 @@ public class DescriptionCacheFactory {
         if (null != classDescription) {
             return classDescription;
         }
-        synchronized (tClass) {
+        LOCK.lock();
+        try {
             classDescription = classDescriptionMap.get(className);
             if (null != classDescription) {
                 return classDescription;
@@ -38,6 +44,40 @@ public class DescriptionCacheFactory {
             classDescription = new ClassDescription<>(tClass);
             classDescriptionMap.put(className, classDescription);
             return classDescription;
+        }finally {
+            LOCK.unlock();
+        }
+    }
+
+    /**
+     * 获取类描述
+     *
+     * @param className
+     * @return
+     */
+    public static ClassDescription getClassDescription(String className) {
+        if (StringUtils.isBlank(className)) {
+            throw new DescriptionException("cannot get class description with classname " + className);
+        }
+        ClassDescription classDescription = classDescriptionMap.get(className);
+        if (null != classDescription) {
+            return classDescription;
+        }
+        LOCK.lock();
+        try {
+            Class<?> loadClass = Thread.currentThread().getContextClassLoader().loadClass(className);
+            classDescription = classDescriptionMap.get(className);
+            if (null != classDescription) {
+                return classDescription;
+            }
+            classDescription = new ClassDescription<>(loadClass);
+            classDescriptionMap.put(className, classDescription);
+            return classDescription;
+        } catch (ClassNotFoundException e) {
+            log.error("", e);
+            return null;
+        } finally {
+            LOCK.unlock();
         }
     }
 

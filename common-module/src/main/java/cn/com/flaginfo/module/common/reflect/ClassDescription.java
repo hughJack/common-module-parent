@@ -1,5 +1,6 @@
 package cn.com.flaginfo.module.common.reflect;
 
+import cn.com.flaginfo.module.common.utils.BeansConverterUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -23,20 +24,29 @@ public class ClassDescription<T> {
 
     private transient volatile boolean hasInit = false;
 
-    private Class<T> clazz;
+    private Class<T> target;
+
+    private T instance;
 
     private Map<String, FieldDescription> fieldsMap = new HashMap<>();
 
-    public ClassDescription(Class<T> clazz) {
-        this.clazz = clazz;
+    public ClassDescription(Class<T> target) {
+        this.target = target;
+        this.instance = BeansConverterUtils.newInstance(target);
     }
 
     public FieldDescription getField(String name) {
-        if (!hasInit) {
-            this.lockInitClassFieldDescription(clazz);
-        }
-        return this.fieldsMap.get(name);
+        return this.getFieldsMap().get(name);
     }
+
+    public Map<String, FieldDescription> getFieldsMap(){
+        if (!hasInit) {
+            this.lockInitClassFieldDescription(target);
+        }
+        return this.fieldsMap;
+    }
+
+    private void setInstance(T t){ }
 
     /**
      * 获取对象的属性值

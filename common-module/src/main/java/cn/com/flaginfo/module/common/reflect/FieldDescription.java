@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -73,6 +74,11 @@ public class FieldDescription {
      */
     private Method writeMethod;
 
+    /**
+     * 注解字段
+     */
+    public Map<String, Object> annotation = new HashMap<>();
+
     private PropertyDescriptor propertyDescriptor;
 
     private void setClazz(Class clazz) {
@@ -126,5 +132,41 @@ public class FieldDescription {
             log.error("", e);
             return null;
         }
+    }
+
+    /**
+     * 查找字段的注解
+     * @param clazz
+     * @param <A>
+     * @return
+     */
+    public <A extends Annotation> boolean hasAnnotation(Class<A> clazz){
+        return null != this.getAnnotation(clazz);
+    }
+
+    /**
+     * 获取字段的注解
+     * @param clazz
+     * @param <A>
+     * @return
+     */
+    public <A extends Annotation> A getAnnotation(Class<A> clazz){
+        if( null == field || null == clazz  ){
+            return null;
+        }
+        Object object = this.annotation.get(clazz.getName());
+        if( null == object ){
+            synchronized (this){
+                object = this.annotation.get(clazz.getName());
+                if( null == object ){
+                    object = this.field.getAnnotation(clazz);
+                    if( null == object ){
+                        object = false;
+                    }
+                    this.annotation.put(clazz.getName(), object);
+                }
+            }
+        }
+       return object instanceof Boolean ? null : (A)object;
     }
 }
