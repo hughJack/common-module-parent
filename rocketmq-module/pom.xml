@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>rocketmq-module</artifactId>
-	<version>6.2.3.RELEASE</version>
+	<version>6.2.4-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>rocketmq-module</name>
@@ -13,7 +13,7 @@
 	<parent>
 		<groupId>cn.com.flaginfo</groupId>
 		<artifactId>common-module-parent</artifactId>
-		<version>6.2.3.RELEASE</version>
+		<version>6.2.4-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
@@ -22,7 +22,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
         <rocketmq.version>4.3.0</rocketmq.version>
-        <ons-client.version>1.7.8.Final</ons-client.version>
+        <ons-client.version>1.8.0.Final</ons-client.version>
 	</properties>
 
 	<dependencies>
@@ -34,12 +34,12 @@
 		<dependency>
 			<groupId>cn.com.flaginfo</groupId>
 			<artifactId>redis-module</artifactId>
-			<version>6.2.3.RELEASE</version>
+			<version>6.2.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>cn.com.flaginfo</groupId>
 			<artifactId>common-module</artifactId>
-			<version>6.2.3.RELEASE</version>
+			<version>6.2.4-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.aliyun.openservices</groupId>

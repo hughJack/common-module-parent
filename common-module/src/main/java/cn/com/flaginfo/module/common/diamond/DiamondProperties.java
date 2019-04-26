@@ -65,7 +65,6 @@ public class DiamondProperties extends DynamicProperties {
 
     @Override
     public Map<String,Object> getAllConfig() {
-        env.getPropertySources();
         MutablePropertySources propertySources = env.getPropertySources();
         MapPropertySource ps = (MapPropertySource)propertySources.get(CONFIG_KEY);
         if(ps == null){

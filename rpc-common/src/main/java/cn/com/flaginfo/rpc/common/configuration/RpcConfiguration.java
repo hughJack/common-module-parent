@@ -59,7 +59,7 @@ public class RpcConfiguration {
      * @param name
      * @return
      */
-    public static RpcLogLevel getLogLevelWithName(String name){
+    public static RpcLogLevel ofName(String name){
         if(StringUtils.isBlank(name)){
             return RpcLogLevel.Succinct;
         }

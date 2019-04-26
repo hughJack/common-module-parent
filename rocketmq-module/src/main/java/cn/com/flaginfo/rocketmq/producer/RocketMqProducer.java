@@ -1,10 +1,8 @@
 package cn.com.flaginfo.rocketmq.producer;
 
-import cn.com.flaginfo.module.common.utils.SpringContextUtils;
 import cn.com.flaginfo.rocketmq.config.RocketMqConfig;
 import cn.com.flaginfo.rocketmq.domain.SendResultDO;
 import cn.com.flaginfo.rocketmq.exception.MqRuntimeException;
-import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -19,30 +17,30 @@ import java.nio.charset.StandardCharsets;
  * @date: 2018/11/22 下午12:01
  */
 @Slf4j
-public class RocketMqProducer extends AbstractMqProducer {
+public class RocketMqProducer extends RocketMqTemplate {
 
     private DefaultMQProducer producer;
 
-    public RocketMqProducer() {
+    private RocketMqConfig rocketMqConfig;
 
+    public RocketMqProducer(RocketMqConfig rocketMqConfig) {
+        this.rocketMqConfig = rocketMqConfig;
     }
 
-    @Override
     public void init() {
         try {
-            RocketMqConfig rocketMqConfig = SpringContextUtils.getBean(RocketMqConfig.class);
             System.setProperty("client.logFileMaxIndex", "10");
-            producer = new DefaultMQProducer();
-            producer.setProducerGroup(rocketMqConfig.getProducerGroup());
+            this.producer = new DefaultMQProducer();
+            this.producer.setProducerGroup(this.rocketMqConfig.getProducerGroup());
             if( log.isDebugEnabled() ){
-                log.debug("rocket producer name address:{}", rocketMqConfig.getAddress());
+                log.debug("rocket this.producer name address:{}", this.rocketMqConfig.getAddress());
             }
-            producer.setNamesrvAddr(rocketMqConfig.getAddress());
-            producer.setInstanceName(getClass().getSimpleName() + hashCode());
-            producer.setHeartbeatBrokerInterval(rocketMqConfig.getHeartbeatBrokerInterval());
-            producer.setMaxMessageSize(rocketMqConfig.getMaxMessageSize());
-            producer.setVipChannelEnabled(rocketMqConfig.getVipChannelEnabled());
-            producer.start();
+            this.producer.setNamesrvAddr(this.rocketMqConfig.getAddress());
+            this.producer.setInstanceName(getClass().getSimpleName() + hashCode());
+            this.producer.setHeartbeatBrokerInterval(this.rocketMqConfig.getHeartbeatBrokerInterval());
+            this.producer.setMaxMessageSize(this.rocketMqConfig.getMaxMessageSize());
+            this.producer.setVipChannelEnabled(this.rocketMqConfig.getVipChannelEnabled());
+            this.producer.start();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
@@ -58,11 +56,6 @@ public class RocketMqProducer extends AbstractMqProducer {
             log.error("MQClientException", e);
             throw new MqRuntimeException("init rocket mq producer error, please check your config.");
         }
-    }
-
-    @Override
-    public void init(String groupId) {
-        init();
     }
 
     @Override

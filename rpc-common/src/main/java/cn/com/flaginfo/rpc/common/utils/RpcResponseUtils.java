@@ -5,8 +5,13 @@ import cn.com.flaginfo.exception.rpc.RpcException;
 import cn.com.flaginfo.exception.rpc.RpcNoResponseException;
 import cn.com.flaginfo.exception.rpc.RpcNullException;
 import cn.com.flaginfo.platform.api.common.base.BaseResponse;
+import cn.com.flaginfo.platform.api.common.base.PagableResponse;
+import cn.com.flaginfo.platform.api.common.base.PageInfo;
 import cn.com.flaginfo.rpc.common.domain.IRpcDTO;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,6 +66,31 @@ public class RpcResponseUtils {
      */
     public static <T> BaseResponse<List<T>> success(List<T> data, int dataCount){
         return success(data, dataCount, SUCCESS_MSG);
+    }
+
+    public static <D> PagableResponse<List<D>> success(PageInfo pageInfo, List<D> data, Integer total){
+        PagableResponse<List<D>> pagableResponse = new PagableResponse<>();
+        if(CollectionUtils.isEmpty(data)){
+            data = Collections.emptyList();
+        }
+        BeanUtils.copyProperties(pageInfo, pagableResponse);
+        pagableResponse.setData(data);
+        pagableResponse.setDataCount(data.size());
+        pagableResponse.setTotal(total);
+        pagableResponse.setCode(SUCCESS);
+        pagableResponse.setMessage(SUCCESS_MSG);
+        return pagableResponse;
+    }
+
+    public static PagableResponse message(String message){
+        return error(ERROR_CODE, message);
+    }
+
+    public static PagableResponse error(Long code, String message){
+        PagableResponse pagableResponse = new PagableResponse();
+        pagableResponse.setCode(code);
+        pagableResponse.setMessage(message);
+        return pagableResponse;
     }
 
     /**

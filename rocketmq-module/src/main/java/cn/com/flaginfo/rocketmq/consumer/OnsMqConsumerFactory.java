@@ -35,13 +35,14 @@ public class OnsMqConsumerFactory {
             return consumer;
         }
         Properties properties = new Properties();
-        properties.put(PropertyKeyConst.MessageModel, mappingDO.getConsumer().messageModel().getModeCN());
+        properties.put(PropertyKeyConst.GROUP_ID, groupName);
         properties.put(PropertyKeyConst.AccessKey, onsMqConfig.getAccessKey());
         properties.put(PropertyKeyConst.SecretKey, onsMqConfig.getSecretKey());
-        properties.put(PropertyKeyConst.ONSAddr, onsMqConfig.getAddress());
-        properties.put(PropertyKeyConst.ConsumerId, groupName);
-        properties.put(PropertyKeyConst.isVipChannelEnabled, onsMqConfig.getVipChannelEnabled());
+        properties.put(PropertyKeyConst.NAMESRV_ADDR, onsMqConfig.getAddress());
         properties.put(PropertyKeyConst.ConsumeThreadNums, onsMqConfig.getConsumeThreadNumber());
+
+        properties.put(PropertyKeyConst.MessageModel, mappingDO.getConsumer().messageModel().getModeCN());
+        properties.put(PropertyKeyConst.isVipChannelEnabled, onsMqConfig.getVipChannelEnabled());
         consumer = ONSFactory.createConsumer(properties);
         consumer.start();
         MQ_HOLDER.put(groupName, consumer);

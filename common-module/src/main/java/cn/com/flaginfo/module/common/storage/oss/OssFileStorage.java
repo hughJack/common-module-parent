@@ -1,8 +1,10 @@
 package cn.com.flaginfo.module.common.storage.oss;
 
+import cn.com.flaginfo.exception.ErrorCode;
 import cn.com.flaginfo.exception.restful.RestfulException;
 import cn.com.flaginfo.module.common.storage.AbstractFileStorage;
-import cn.com.flaginfo.module.common.storage.FileStorage;
+import cn.com.flaginfo.module.common.utils.FileFormatterUtils;
+import cn.com.flaginfo.module.common.utils.ImageUtils;
 import com.alibaba.fastjson.JSONObject;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSErrorCode;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +87,11 @@ public class OssFileStorage extends AbstractFileStorage {
             }
         }
         try {
-            URL url = new URL(ossConfiguration.getEndpoint());
+            String endpoint = ossConfiguration.getEndpoint();
+            if( !endpoint.contains("http")){
+                endpoint = "http://" + endpoint;
+            }
+            URL url = new URL(endpoint);
             baseHost = url.getHost();
             basePath = new StringBuilder(url.getProtocol())
                     .append("://")
@@ -95,7 +102,7 @@ public class OssFileStorage extends AbstractFileStorage {
                     .toString();
             log.info("init storage base path is : {}", basePath);
             if (StringUtils.isNotBlank(ossConfiguration.getEndpointAlias())) {
-                url = new URL(ossConfiguration.getEndpointAlias());
+                url = new URL(endpoint);
                 aliasBaseHost = url.getHost();
                 aliasBasePath = new StringBuilder(url.getProtocol())
                         .append("://")
@@ -138,7 +145,7 @@ public class OssFileStorage extends AbstractFileStorage {
             return uploadInputStream(inputStream, null, null, name);
         } catch (IOException e) {
             log.error("", e);
-            throw new RestfulException("上传文件失败");
+            throw new RestfulException(ErrorCode.UPLOAD_FILE_FAILED);
         }
     }
 
@@ -170,12 +177,14 @@ public class OssFileStorage extends AbstractFileStorage {
      */
     @Override
     public String uploadInputStream(InputStream in, ObjectMetadata objectMetadata, String... name) {
+        long start = System.currentTimeMillis();
         String saveName = joinPath(name);
         PutObjectResult result = ossClient.putObject(ossConfiguration.getBucketName(),
                 saveName, in, objectMetadata);
         if( log.isDebugEnabled() ){
             log.debug("upload {} success, eTag is {}", saveName, result.getETag());
         }
+        log.info("upload file take {}ms.", System.currentTimeMillis() - start);
         return transformPath(saveName);
     }
 
@@ -195,13 +204,14 @@ public class OssFileStorage extends AbstractFileStorage {
                 FilenameUtils.getExtension(file.getOriginalFilename()));
         try (InputStream inputStream = file.getInputStream()) {
             String fileType = FilenameUtils.getExtension("." + file.getOriginalFilename());
+            String[] paths = Arrays.copyOf(path, path.length + 1);
+            paths[paths.length - 1] = fileName;
             return uploadInputStream(inputStream,
-                    buildObjectMetadata(file.getOriginalFilename(), inputStream.available(), FileStorage.getContentTypeWithExtension(fileType), fileType),
-                    joinPath(path),
-                    fileName);
+                    buildObjectMetadata(file.getOriginalFilename(), inputStream.available(), fileType),
+                    paths);
         } catch (IOException e) {
             log.error("", e);
-            throw new RestfulException("上传文件失败");
+            throw new RestfulException(ErrorCode.UPLOAD_FILE_FAILED);
         }
     }
 
@@ -212,18 +222,55 @@ public class OssFileStorage extends AbstractFileStorage {
     @Override
     public String uploadBase64Image(String base64Str, String... path) throws RestfulException {
         if (StringUtils.isBlank(base64Str)) {
-            throw new RestfulException("the base64 string for image is illegal.");
+            log.error("base64 code string is blank.");
+            throw new RestfulException(ErrorCode.ILLEGAL_IMAGE);
         }
-        String fileName = UUID.randomUUID().toString() + DEFAULT_IMG_FORMATTER;
         byte[] b = Base64Utils.decodeFromString(base64Str);
-        try (InputStream inputStream = new ByteArrayInputStream(b)) {
+        return this.uploadByteImage(b, FileFormatterUtils.getFormatterWithBase64Str(base64Str), path);
+    }
+
+    /**
+     * @param bytes
+     * @return
+     */
+    @Override
+    public String uploadByteImage(byte[] bytes, String formatter, String... path) throws RestfulException {
+        if (null == bytes) {
+            log.error("image bytes are empty.");
+            throw new RestfulException(ErrorCode.ILLEGAL_IMAGE);
+        }
+        if( StringUtils.isBlank(formatter) ){
+            formatter = DEFAULT_IMG_FORMATTER;
+        }
+        String fileName = UUID.randomUUID().toString() + formatter;
+        try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
+            String[] paths = Arrays.copyOf(path, path.length + 1);
+            paths[paths.length - 1] = fileName;
             return uploadInputStream(inputStream,
-                    buildObjectMetadata(fileName, inputStream.available(), DEFAULT_IMG_FORMATTER, FileStorage.getContentTypeWithBase64Str(base64Str)),
-                    joinPath(path), fileName);
+                    buildObjectMetadata(fileName, inputStream.available(), formatter),
+                    paths);
         } catch (Exception e) {
             log.error("", e);
-            throw new RestfulException("上传文件失败");
+            throw new RestfulException(ErrorCode.UPLOAD_FILE_FAILED);
         }
+    }
+
+    @Override
+    public String uploadAvatarImage(byte[] bytes, String... path) throws RestfulException {
+        if (null == bytes) {
+            log.warn("image bytes are empty.");
+            throw new RestfulException(ErrorCode.ILLEGAL_IMAGE);
+        }
+        String format = ImageUtils.imageType(new ByteArrayInputStream(bytes));
+        if (StringUtils.isNotBlank(format)) {
+            if (!ArrayUtils.contains(new String[] {"png", "jpg",  "jpeg"}, format)) {
+                bytes = ImageUtils.toJpegBytes(bytes);
+            }
+        } else {
+            log.warn("Unsupported Image File Format [{}]", format);
+            throw new RestfulException(ErrorCode.ILLEGAL_IMAGE);
+        }
+        return this.uploadByteImage(bytes, DEFAULT_AVATAR_FORMATTER, path);
     }
 
     /**
@@ -288,8 +335,8 @@ public class OssFileStorage extends AbstractFileStorage {
              OutputStream fOut = new FileOutputStream(file)) {
             IOUtils.copy(fIn, fOut);
         } catch (IOException e) {
-            log.error("", e);
-            throw new RestfulException("download file [" + url + "] error.", e);
+            log.error("download file [" + url + "] error.", e);
+            throw new RestfulException(ErrorCode.DOWNLOAD_FILE_FAILED);
         }
         return file;
     }
@@ -378,7 +425,7 @@ public class OssFileStorage extends AbstractFileStorage {
         return resp;
     }
 
-    private ObjectMetadata buildObjectMetadata(String fileName, int length, String formatter, String fileType) {
+    private ObjectMetadata buildObjectMetadata(String fileName, int length, String formatter) {
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentLength(length);
         objectMetadata.setContentEncoding(StandardCharsets.UTF_8.toString());
@@ -386,9 +433,9 @@ public class OssFileStorage extends AbstractFileStorage {
         objectMetadata.setContentDisposition("inline;filename=" + fileName);
         objectMetadata.setHeader("Pragma", "no-cache");
         Map<String, String> map = new HashMap<>(1);
-        map.put("File-Type", fileType);
+        map.put("File-Type", formatter);
         objectMetadata.setUserMetadata(map);
-        objectMetadata.setContentType(formatter);
+        objectMetadata.setContentType(FileFormatterUtils.getContentTypeWithExtension(formatter));
         return objectMetadata;
     }
 

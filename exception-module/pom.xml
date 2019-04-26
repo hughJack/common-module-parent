@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>exception-module</artifactId>
-    <version>6.2.3.RELEASE</version>
+    <version>6.2.4-SNAPSHOT</version>
     <name>exception-module</name>
 
     <properties>
@@ -16,7 +16,7 @@
     <parent>
         <groupId>cn.com.flaginfo</groupId>
         <artifactId>common-module-parent</artifactId>
-        <version>6.2.3.RELEASE</version>
+        <version>6.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

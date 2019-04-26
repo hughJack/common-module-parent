@@ -95,7 +95,7 @@ public class RedisCacheConfiguration implements ApplicationListener<ContextRefre
         if (CollectionUtils.isEmpty(redisCacheSet)) {
             return;
         }
-        redisCacheSet.parallelStream()
+        redisCacheSet.stream()
                 .forEach(redisCache -> RedisLocalCacheFactory.createIfNotExist(redisCache));
         redisCacheSet.clear();
     }

@@ -33,4 +33,8 @@ public class MongoDBProperties extends BaseProperties {
      * 数据库
      */
     private String database;
+    /**
+     * dot key
+     */
+    private String mapKeyDotReplacement = "\\{0x2E\\}";
 }

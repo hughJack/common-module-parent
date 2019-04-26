@@ -22,19 +22,23 @@ public enum RpcService {
     /**
      * 通讯录服务
      */
-    ADDRESS_BOOK_SERVICE(ErrorCode.ADDRESS_BOOK_SERVICE_UNAVAILABLE),
+    CONTACT_SERVICE(ErrorCode.CONTACT_SERVICE_UNAVAILABLE),
     /**
      * 平台消息中心
      */
     SMS_SERVICE(ErrorCode.SMS_SERVICE_UNAVAILABLE),
     /**
-     * 新闻推荐服务
+     * 内容推荐服务
      */
-    NEWS_RECOMMEND_SERVICE(ErrorCode.NEWS_RECOMMEND_SERVICE),
+    ITEM_RECOMMEND_SERVICE(ErrorCode.ITEM_RECOMMEND_SERVICE),
     /**
      * 推荐交互服务
      */
-    BIZ_COMMEND_SERVICE(ErrorCode.BIZ_COMMEND_SERVICE);
+    BIZ_COMMEND_SERVICE(ErrorCode.BIZ_COMMEND_SERVICE),
+    /**
+     * 未知服务
+     */
+    UNKNOWN_SERVICE(ErrorCode.UNKNOWN_SERVICE);
 
     /**
      * 服务错误码
@@ -45,7 +49,7 @@ public enum RpcService {
         this.restfulCode = restfulCode;
     }
 
-    public ErrorCode getErrorCode(){
+    public ErrorCode errorCode(){
         return this.restfulCode;
     }
 }

@@ -1,6 +1,7 @@
 package cn.com.flaginfo.redis.cache;
 
 import cn.com.flaginfo.module.common.domain.LocalCache;
+import cn.com.flaginfo.module.reflect.AnnotationResolver;
 import cn.com.flaginfo.redis.RedisUtils;
 import cn.com.flaginfo.redis.lock.jedis.impl.RedisLockNx;
 import lombok.extern.slf4j.Slf4j;
@@ -186,7 +187,7 @@ public class RedisCachePointProcessor {
             synchronized (lock) {
                 lockObj = distributedLockCache.get(lockKey);
                 if (null == lockObj) {
-                    lockObj = new RedisLockNx(lockKey);
+                    lockObj = new RedisLockNx(lockKey, redisCache.lockExpire(), redisCache.tryLockTimeout());
                     distributedLockCache.put(lockKey, lockObj);
                 }
             }
@@ -385,10 +386,6 @@ public class RedisCachePointProcessor {
             return cache.cacheKey();
         }
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
-        RedisCacheKeyGenerator redisCacheKeyGenerator = new RedisCacheKeyGenerator();
-        redisCacheKeyGenerator.setCacheKey(cache.cacheKey());
-        redisCacheKeyGenerator.setArgsNames(methodSignature.getParameterNames());
-        redisCacheKeyGenerator.setArgsValues(point.getArgs());
-        return redisCacheKeyGenerator.generate();
+        return AnnotationResolver.resolver(cache.cacheKey(), methodSignature.getParameterNames(), point.getArgs());
     }
 }

@@ -1,6 +1,6 @@
 package cn.com.flaginfo.rocketmq.boot;
 
-import cn.com.flaginfo.rocketmq.MqConsumerContext;
+import cn.com.flaginfo.rocketmq.consumer.MqConsumerLoader;
 import cn.com.flaginfo.rocketmq.domain.ActionMappingDO;
 import cn.com.flaginfo.rocketmq.domain.ConsumerResultDO;
 import cn.com.flaginfo.rocketmq.message.MqMessage;
@@ -23,7 +23,7 @@ public class SechdulePullTask implements PullTaskCallback {
         log.info("RocketMQ doPullTask topicName:" + mq.getTopic());
         try {
             MQPullConsumer consumer = context.getPullConsumer();
-            ActionMappingDO action = MqConsumerContext.getInstance().getPullTopicMapping().get(mq.getTopic());
+            ActionMappingDO action = MqConsumerLoader.getInstance().getPullTopicMapping().get(mq.getTopic());
             long offset = consumer.fetchConsumeOffset(mq, false);
             offset = offset < 0 ? 0 : offset;
             log.info("RocketMQ pull queue id : {} ,offset : {}", mq.getBrokerName() + "-" + mq.getQueueId(), offset);

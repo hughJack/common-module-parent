@@ -1,7 +1,8 @@
 package cn.com.flaginfo.rocketmq.boot;
 
-import cn.com.flaginfo.rocketmq.MqConsumerContext;
+import cn.com.flaginfo.rocketmq.RocketMqBoot;
 import cn.com.flaginfo.rocketmq.annotation.PushTopic;
+import cn.com.flaginfo.rocketmq.consumer.MqConsumerLoader;
 import cn.com.flaginfo.rocketmq.consumer.RocketMqConsumerFactory;
 import cn.com.flaginfo.rocketmq.domain.ActionMappingDO;
 import cn.com.flaginfo.rocketmq.exception.MqRuntimeException;
@@ -64,7 +65,7 @@ public class RocketMqPushConsumerBoot extends AbstractConsumerBoot {
     @Override
     public void bindAction() {
         log.info("RocketMQ push boot bing action start...");
-        Map<String, ActionMappingDO> action = MqConsumerContext.getInstance().getPushTopicMapping();
+        Map<String, ActionMappingDO> action = MqConsumerLoader.getInstance().getPushTopicMapping();
         if( CollectionUtils.isEmpty(action) ){
             log.info("RocketMQ push boot bing action ");
             return;
@@ -81,7 +82,7 @@ public class RocketMqPushConsumerBoot extends AbstractConsumerBoot {
                 if(StringUtils.isBlank(groupName)){
                     groupName = this.generationConsumerGroupId(mapping);
                 }
-                groupName = this.getConsumerId(groupName);
+                groupName = RocketMqBoot.getConsumerId(groupName);
                 DefaultMQPushConsumer pushConsumer = RocketMqConsumerFactory.getPushConsumer(mapping, groupName);
                 String topicTitle = mapping.getPushTopic().title();
                 log.info("RocketMQ push consumer load mapping:{}", mapping);

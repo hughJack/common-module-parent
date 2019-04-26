@@ -15,8 +15,6 @@ import java.util.List;
 @Slf4j
 public class RestfulResponseUtils {
 
-    private static final String SUCCESS_MSG = "请求成功";
-
     /**
      * 成功，返回空数据
      *
@@ -27,13 +25,49 @@ public class RestfulResponseUtils {
     }
 
     /**
+     * 操作成功，返回空数据
+     *
+     * @return
+     */
+    public static RestfulResponse operationSuccess() {
+        return success(HttpResponseVO.emptyHttpResponseVO(), ErrorCode.OPERATION_SUCCESS.message());
+    }
+
+    /**
+     * 设置成功，返回空数据
+     *
+     * @return
+     */
+    public static RestfulResponse setupSuccess() {
+        return success(HttpResponseVO.emptyHttpResponseVO(), ErrorCode.SETUP_SUCCESS.message());
+    }
+
+    /**
+     * 保存成功，返回空数据
+     *
+     * @return
+     */
+    public static RestfulResponse saveSuccess() {
+        return success(HttpResponseVO.emptyHttpResponseVO(), ErrorCode.SAVE_SUCCESS.message());
+    }
+    
+    /**
+     * 更新成功，返回空数据
+     *
+     * @return
+     */
+    public static RestfulResponse updateSuccess() {
+        return success(HttpResponseVO.emptyHttpResponseVO(), ErrorCode.UPDATE_SUCCESS.message());
+    }
+    
+    /**
      * 成功返回Object
      *
      * @param data
      * @return
      */
     public static RestfulResponse success(Object data) {
-        return success(data, SUCCESS_MSG);
+        return success(data, ErrorCode.SUCCESS.message());
     }
 
     /**
@@ -57,7 +91,7 @@ public class RestfulResponseUtils {
      * @return
      */
     public static RestfulResponse success(List<Object> data, int dataCount) {
-        return success(data, dataCount, SUCCESS_MSG);
+        return success(data, dataCount, ErrorCode.SUCCESS.message());
     }
 
     /**
@@ -121,6 +155,6 @@ public class RestfulResponseUtils {
         if (null == restfulResponse) {
             return false;
         }
-        return ErrorCode.SUCCESS.getCode().equals(restfulResponse.getCode());
+        return ErrorCode.SUCCESS.code().equals(restfulResponse.getCode());
     }
 }

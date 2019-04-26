@@ -1,7 +1,8 @@
 package cn.com.flaginfo.rocketmq.boot;
 
-import cn.com.flaginfo.rocketmq.MqConsumerContext;
+import cn.com.flaginfo.rocketmq.RocketMqBoot;
 import cn.com.flaginfo.rocketmq.config.ConsumerType;
+import cn.com.flaginfo.rocketmq.consumer.MqConsumerLoader;
 import cn.com.flaginfo.rocketmq.consumer.OnsMqConsumerFactory;
 import cn.com.flaginfo.rocketmq.domain.ActionMappingDO;
 import cn.com.flaginfo.rocketmq.message.OnsMqMessageAdapter;
@@ -71,7 +72,7 @@ public class OnsConsumerBoot extends AbstractConsumerBoot {
     @Override
     public void bindAction() {
         log.info("Ons consumer boot bing action start...");
-        Map<String, ActionMappingDO> action = MqConsumerContext.getInstance().getAllTopicMapping();
+        Map<String, ActionMappingDO> action = MqConsumerLoader.getInstance().getAllTopicMapping();
         if( CollectionUtils.isEmpty(action) ){
             return;
         }
@@ -91,7 +92,7 @@ public class OnsConsumerBoot extends AbstractConsumerBoot {
             if(StringUtils.isBlank(groupName)){
                 groupName = this.generationConsumerGroupId(mapping);
             }
-            groupName = this.getConsumerId(groupName);
+            groupName = RocketMqBoot.getConsumerId(groupName);
             Consumer pushConsumer = OnsMqConsumerFactory.getConsumer(mapping, groupName);
             String topicTitle = mapping.getPushTopic().title();
             if( StringUtils.isBlank(topicTitle) ){

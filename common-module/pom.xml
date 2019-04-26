@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>common-module</artifactId>
-    <version>6.2.3.RELEASE</version>
+    <version>6.2.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>common-module</name>
@@ -20,16 +20,16 @@
         <diamond.version>2.0.5.3</diamond.version>
         <log4j-over-slf4j.version>1.7.25</log4j-over-slf4j.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
-        <httpclient.version>4.4.1</httpclient.version>
         <commons-io.version>2.4</commons-io.version>
         <aliyun-sdk-oss.version>2.8.3</aliyun-sdk-oss.version>
         <imgscalr.lib.version>4.2</imgscalr.lib.version>
+        <reflect-module.version>6.1.0-SNAPSHOT</reflect-module.version>
     </properties>
 
     <parent>
         <groupId>cn.com.flaginfo</groupId>
         <artifactId>common-module-parent</artifactId>
-        <version>6.2.3.RELEASE</version>
+        <version>6.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -38,6 +38,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <dependency>
@@ -63,7 +68,7 @@
         <dependency>
             <groupId>cn.com.flaginfo</groupId>
             <artifactId>exception-module</artifactId>
-            <version>6.2.3.RELEASE</version>
+            <version>6.2.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -97,12 +102,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>${httpclient.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
@@ -124,6 +123,12 @@
             <groupId>com.aliyun.oss</groupId>
             <artifactId>aliyun-sdk-oss</artifactId>
             <version>${aliyun-sdk-oss.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.com.flaginfo</groupId>
+            <artifactId>reflect-module</artifactId>
+            <version>${reflect-module.version}</version>
         </dependency>
     </dependencies>
 </project>

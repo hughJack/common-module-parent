@@ -1,17 +1,14 @@
 package cn.com.flaginfo.exception;
 
-import cn.com.flaginfo.exception.i18n.LocaleHolder;
 import cn.com.flaginfo.exception.i18n.MessageStore;
-import lombok.Getter;
 
 /**
  * 通用错误码
  * code错误码
- * message国家化key
+ * message国际化key
  * @author: Meng.Liu
  * @date: 2018/12/17 上午10:52
  */
-@Getter
 public enum ErrorCode {
 
     //restful错误码
@@ -19,6 +16,22 @@ public enum ErrorCode {
      * 请求成功
      */
     SUCCESS(0L, "request.success"),
+    /**
+     * 操作成功
+     */
+    OPERATION_SUCCESS(0L, "operation.success"),
+    /**
+     * 设置成功
+     */
+    SETUP_SUCCESS(0L, "setup.success"),
+    /**
+     * 保存成功
+     */
+    SAVE_SUCCESS(0L, "save.success"),
+    /**
+     * 更新成功
+     */
+    UPDATE_SUCCESS(0L, "update.success"),
     /**
      * 系统繁忙
      */
@@ -221,7 +234,150 @@ public enum ErrorCode {
      * 找不到任何记录
      */
     CANNOT_FIND_ANY_RECORD(400055L, "cannot.find.any.record"),
-
+    /**
+     * 找不到任何信息
+     */
+    CANNOT_FIND_ANY_INFORMATION(400056L, "cannot.find.any.information"),
+    /**
+     * 操作失败
+     */
+    OPERATION_FAILURE(400057L, "operation.failure"),
+    /**
+     * 设置失败
+     */
+    SETUP_FAILURE(400057L, "setup.failure"),
+    /**
+     * 保存失败
+     */
+    SAVE_FAILURE(400057L, "save.failure"),
+    /**
+     * 更新失败
+     */
+    UPDATE_FAILURE(400057L, "update.failure"),
+    /**
+     * 缺少聊天室编号
+     */
+    LACK_ROOM_ID(400058L, "lack.room.id"),
+    /**
+     * 缺少类型
+     */
+    LACK_TYPE(400059L, "lack.type"),
+    /**
+     * 缺少内容
+     */
+    LACK_CONTENT(400060L, "lack.content"),
+    /**
+     * 缺少图片
+     */
+    LACK_IMAGE(400061L, "lack.image"),
+    /**
+     * 缺少文件
+     */
+    LACK_FILE(400062L, "lack.file"),
+    /**
+     * 缺少语音
+     */
+    LACK_VOICE(400063L, "lack.voice"),
+    /**
+     * 缺少视频
+     */
+    LACK_VIDEO(400064L, "lack.video"),
+    /**
+     * 无效的图片
+     */
+    ILLEGAL_IMAGE(400065L, "illegal.image"),
+    /**
+     * 无效的文件
+     */
+    ILLEGAL_FILE(400066L, "illegal.file"),
+    /**
+     * 无效的语音
+     */
+    ILLEGAL_VOICE(400067L, "illegal.voice"),
+    /**
+     * 无效的视频
+     */
+    ILLEGAL_VIDEO(400068L, "illegal.video"),
+    /**
+     * 上传文件失败
+     */
+    UPLOAD_FILE_FAILED(400069L, "upload.file.failed"),
+    /**
+     * 下传文件失败
+     */
+    DOWNLOAD_FILE_FAILED(400070L, "download.file.failed"),
+    /**
+     * 缺少起始编号
+     */
+    LACK_START_ID(400071L, "lack.start.id"),
+    /**
+     * 缺少编号
+     */
+    LACK_ID(400072L, "lack.id"),
+    /**
+     * 缺少最后一条编号
+     */
+    LACK_LAST_ID(400073L, "lack.last.id"),
+    /**
+     * 缺少状态值
+     */
+    LACK_STATUS(400074L, "lack.status"),
+    /**
+     * 缺少产品编号
+     */
+    LACK_PRODUCT_ID(400075L, "lack.product.id"),
+    /**
+     * 发送失败
+     */
+    SEND_FAILED(400076L, "send.failed"),
+    /**
+     * 发送失败
+     */
+    LACK_ALERT_ID(400077L, "lack.alert.id"),
+    /**
+     * 缺少标题
+     */
+    LACK_TITLE(400078L, "lack.title"),
+    /**
+     * 缺少时间
+     */
+    LACK_DATE(400079L, "lack.date"),
+    /**
+     * 设置时间不能早于当前时间
+     */
+    SET_TIME_CANNOT_EARLIER_NOW(400080L, "set.time.cannot.earlier.now"),
+    /**
+     * 设置时间不能晚于当前时间
+     */
+    SET_TIME_CANNOT_LATER_NOW(400081L, "set.time.cannot.later.now"),
+    /**
+     * 请求参数格式不正确
+     */
+    ILLEGAL_REQUEST_PARAMS_FORMAT(400082L, "illegal.request.params.format"),
+    /**
+     * 缺少隔离编码
+     */
+    LACK_ISOLATION_ID(400083L, "lack.isolation.id"),
+    /**
+     * 查询通讯录成员信息失败
+     */
+    QUERY_CONTACT_MEMBER_INFO_FAILED(400084L, "query.contact.member.info.failed"),
+    /**
+     * 功能不可用
+     */
+    FUNCTION_UNAVAILABLE(400085L, "function.unavailable"),
+    /**
+     * 缺少坐标信息
+     */
+    LACK_LOCATION_INFO(400086L, "lack.location.info"),
+    /**
+     * 图片尺寸太大
+     */
+    IMAGE_SIZE_TOO_BIG(400087L, "image.size.too.big"),
+    /**
+     * 图片尺寸太小
+     */
+    IMAGE_SIZE_TOO_SMALL(400088L, "image.size.too.small"),
 
     //restful请求头错误码
     /**
@@ -341,7 +497,7 @@ public enum ErrorCode {
     /**
      * 通讯录服务不可用
      */
-    ADDRESS_BOOK_SERVICE_UNAVAILABLE(600030L, "address.book.service.unavailable"),
+    CONTACT_SERVICE_UNAVAILABLE(600030L, "contact.service.unavailable"),
     /**
      * 用户中心服务不可用
      */
@@ -353,7 +509,7 @@ public enum ErrorCode {
     /**
      * 消息推荐服务
      */
-    NEWS_RECOMMEND_SERVICE(600060L,  "news.recommend.service.unavailable"),
+    ITEM_RECOMMEND_SERVICE(600060L,  "item.recommend.service.unavailable"),
     /**
      * 推荐交互服务
      */
@@ -361,10 +517,12 @@ public enum ErrorCode {
     /**
      * 推荐统计服务
      */
-    RECOMMEND_SYSTEM_ESTIMATION(600080L,  "recommend.system.estimation.service.unavailable");
+    RECOMMEND_SYSTEM_ESTIMATION(600080L,  "recommend.system.estimation.service.unavailable"),
 
-
-
+    /**
+     * 未知服务
+     */
+    UNKNOWN_SERVICE(600404L,  "recommend.system.estimation.service.unavailable");
 
     /**
      * 错误码
@@ -385,7 +543,7 @@ public enum ErrorCode {
     }
 
     public String message() {
-        return MessageStore.getMessage(LocaleHolder.get(), this.message);
+        return MessageStore.getMessage(this.message);
     }
 
     /**
@@ -393,7 +551,7 @@ public enum ErrorCode {
      * @param name
      * @return
      */
-    public static ErrorCode getRestfulCode(String name){
+    public static ErrorCode getErrorCode(String name){
         for (ErrorCode item : ErrorCode.values()) {
             if (item.name().equals(name)) {
                 return item;
@@ -424,6 +582,5 @@ public enum ErrorCode {
     public String toString() {
         return this.name();
     }
-
 
 }

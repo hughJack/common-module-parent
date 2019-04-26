@@ -4,7 +4,7 @@ import cn.com.flaginfo.module.common.constants.Constants;
 import cn.com.flaginfo.module.common.diamond.DiamondProperties;
 import cn.com.flaginfo.module.common.utils.TimeUtils;
 import cn.com.flaginfo.redis.RedisUtils;
-import cn.com.flaginfo.rocketmq.MqConsumerContext;
+import cn.com.flaginfo.rocketmq.consumer.MqConsumerLoader;
 import cn.com.flaginfo.rocketmq.annotation.PushTopic;
 import cn.com.flaginfo.rocketmq.config.ConsumerType;
 import cn.com.flaginfo.rocketmq.config.MqType;
@@ -169,7 +169,7 @@ public abstract class AbstractMqMessageAdapter<T> {
         if (StringUtils.isBlank(topicName) && StringUtils.isBlank(tagName)) {
             return null;
         }
-        return MqConsumerContext.getInstance().getConsumerActionMapping(consumerType, topicName, tagName);
+        return MqConsumerLoader.getInstance().getConsumerActionMapping(consumerType, topicName, tagName);
 
     }
 

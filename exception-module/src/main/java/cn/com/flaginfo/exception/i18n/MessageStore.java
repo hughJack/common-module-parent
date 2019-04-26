@@ -31,7 +31,7 @@ public class MessageStore {
     }
 
     public static String getMessage(String key){
-        return getMessage(THIS.messageSourceConfiguration.getDefaultLocale(), key);
+        return getMessage(LocaleHolder.get(), key);
     }
 
     public static String getMessage(Locale locale, String key){

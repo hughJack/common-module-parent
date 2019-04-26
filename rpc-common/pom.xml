@@ -4,13 +4,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>rpc-common</artifactId>
-    <version>6.2.3.RELEASE</version>
+    <version>6.2.4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>cn.com.flaginfo</groupId>
         <artifactId>common-module-parent</artifactId>
-        <version>6.2.3.RELEASE</version>
+        <version>6.2.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -54,14 +54,14 @@
         <dependency>
             <groupId>cn.com.flaginfo</groupId>
             <artifactId>common-module</artifactId>
-            <version>6.2.3.RELEASE</version>
+            <version>6.2.4-SNAPSHOT</version>
             <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>cn.com.flaginfo</groupId>
             <artifactId>exception-module</artifactId>
-            <version>6.2.3.RELEASE</version>
+            <version>6.2.4-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

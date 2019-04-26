@@ -29,10 +29,10 @@ public @interface RedisCache {
 
     /**
      * 缓存的key
-     * 支持预编译符，例如: Cache:{0}:{memberId}:{authInfo.id}
-     * {0}表示第0个参数，后面的依次类推
-     * {memberId}表示参数名称为memberId的参数
-     * {authInfo.id}表示参数名为authInfo的对象的id属性
+     * 支持预编译符，例如: Cache:#{0}:#{memberId}:#{authInfo.id}
+     * #{0}表示第0个参数，后面的依次类推
+     * #{memberId}表示参数名称为memberId的参数
+     * #{authInfo.id}表示参数名为authInfo的对象的id属性
      * @return
      */
     String cacheKey();
@@ -48,6 +48,20 @@ public @interface RedisCache {
      * @return
      */
     boolean singleLoader() default false;
+
+    /**
+     * 获取锁的时间
+     * 单位 : 毫秒(ms)
+     * @return
+     */
+    long tryLockTimeout() default 100;
+
+    /**
+     * 锁的有效时间
+     * 单位 : 秒(s)
+     * @return
+     */
+    int lockExpire() default 60;
 
     /**
      * 缓存过期时间

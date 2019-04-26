@@ -30,6 +30,10 @@ public class OnsMqConfig {
      */
     private String address;
     /**
+     * 生产者组名称
+     */
+    private String producerGroupName;
+    /**
      * 消费者线程数
      */
     private Integer consumeThreadNumber = 10;

@@ -48,6 +48,12 @@ import java.util.List;
     T insert(T entity);
 
     /**
+     * 批量新增
+     * @param entityList
+     */
+    void insertMany(List<T> entityList);
+
+    /**
      * 通过ID获取记录
      * @param id
      * @return

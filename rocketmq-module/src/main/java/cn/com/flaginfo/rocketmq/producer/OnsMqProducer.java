@@ -1,10 +1,8 @@
 package cn.com.flaginfo.rocketmq.producer;
 
-import cn.com.flaginfo.module.common.utils.SpringContextUtils;
+import cn.com.flaginfo.rocketmq.RocketMqBoot;
 import cn.com.flaginfo.rocketmq.config.OnsMqConfig;
 import cn.com.flaginfo.rocketmq.domain.SendResultDO;
-import cn.com.flaginfo.rocketmq.exception.MqRuntimeException;
-import com.alibaba.fastjson.JSONObject;
 import com.aliyun.openservices.ons.api.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -17,29 +15,33 @@ import java.util.Properties;
  * @date: 2018/11/22 下午12:02
  */
 @Slf4j
-public class OnsMqProducer extends AbstractMqProducer {
+public class OnsMqProducer extends RocketMqTemplate {
 
     private Producer producer;
 
-    public OnsMqProducer() {
+    private OnsMqConfig onsMqConfig;
+
+    private String defaultProducerGroupName;
+
+    public OnsMqProducer(OnsMqConfig onsMqConfig, String defaultProducerGroupName) {
+        this.onsMqConfig = onsMqConfig;
+        this.defaultProducerGroupName = defaultProducerGroupName;
     }
 
-    @Override
     public void init() {
-        //do nothing
-        throw new MqRuntimeException("please use the method `init(groupId)` to init.");
-    }
-
-    @Override
-    public void init(String groupName) {
-        log.info("init ons producer, producer id : {}", groupName);
-        OnsMqConfig onsMqConfig = SpringContextUtils.getBean(OnsMqConfig.class);
+        String groupName;
+        if( null == this.onsMqConfig || StringUtils.isBlank(this.onsMqConfig.getProducerGroupName()) ){
+            groupName = RocketMqBoot.getProducerId(defaultProducerGroupName);
+        }else{
+            groupName = RocketMqBoot.getProducerId(this.onsMqConfig.getProducerGroupName());
+        }
+        log.info("init ons producer, producer name : {}", groupName);
         Properties properties = new Properties();
-        properties.put(PropertyKeyConst.ONSAddr, onsMqConfig.getAddress());
-        properties.put(PropertyKeyConst.AccessKey, onsMqConfig.getAccessKey());
-        properties.put(PropertyKeyConst.SecretKey, onsMqConfig.getSecretKey());
-        properties.put(PropertyKeyConst.ProducerId, groupName);
-        properties.put(PropertyKeyConst.isVipChannelEnabled, onsMqConfig.getVipChannelEnabled());
+        properties.put(PropertyKeyConst.NAMESRV_ADDR, this.onsMqConfig.getAddress());
+        properties.put(PropertyKeyConst.AccessKey, this.onsMqConfig.getAccessKey());
+        properties.put(PropertyKeyConst.SecretKey, this.onsMqConfig.getSecretKey());
+        properties.put(PropertyKeyConst.GROUP_ID, groupName);
+        properties.put(PropertyKeyConst.isVipChannelEnabled, this.onsMqConfig.getVipChannelEnabled());
         producer = ONSFactory.createProducer(properties);
         producer.start();
         log.info("init ons producer success.");

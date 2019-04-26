@@ -13,13 +13,28 @@ import java.lang.annotation.*;
 @Documented
 public @interface RpcInterface {
     /**
-     * 服务名称
+     * 服务
      * @return
      */
-    RpcService service();
+    RpcService service() default RpcService.UNKNOWN_SERVICE;
     /**
      * 接口
      * @return
      */
     Class<?> serviceInterface();
+    /**
+     * 服务名称
+     * @return
+     */
+    String serviceName() default "";
+    /**
+     * 服务编码
+     * @return
+     */
+    long serviceCode() default Long.MIN_VALUE;
+    /**
+     * 服务错误信息
+     * @return
+     */
+    String errorMessage() default "";
 }

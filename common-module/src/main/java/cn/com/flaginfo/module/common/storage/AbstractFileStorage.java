@@ -11,6 +11,8 @@ public abstract class AbstractFileStorage implements FileStorage {
 
     public static final String DEFAULT_IMG_FORMATTER = ".png";
 
+    public static final String DEFAULT_AVATAR_FORMATTER = ".jpg";
+
     public static final String separator = "/";
     public static final String point = ".";
 

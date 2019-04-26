@@ -1,6 +1,7 @@
 package cn.com.flaginfo.rocketmq.boot;
 
-import cn.com.flaginfo.rocketmq.MqConsumerContext;
+import cn.com.flaginfo.rocketmq.RocketMqBoot;
+import cn.com.flaginfo.rocketmq.consumer.MqConsumerLoader;
 import cn.com.flaginfo.rocketmq.consumer.RocketMqConsumerFactory;
 import cn.com.flaginfo.rocketmq.domain.ActionMappingDO;
 import lombok.extern.slf4j.Slf4j;
@@ -67,7 +68,7 @@ public class RocketMqPullConsumerBoot extends AbstractConsumerBoot {
     @Override
     public void bindAction() {
         log.info("RocketMQ pull  boot bing action start...");
-        Map<String, ActionMappingDO> action = MqConsumerContext.getInstance().getPullTopicMapping();
+        Map<String, ActionMappingDO> action = MqConsumerLoader.getInstance().getPullTopicMapping();
         if( CollectionUtils.isEmpty(action) ){
             return;
         }
@@ -81,7 +82,7 @@ public class RocketMqPullConsumerBoot extends AbstractConsumerBoot {
             if(StringUtils.isBlank(groupName)){
                 groupName = this.generationConsumerGroupId(mapping);
             }
-            groupName = this.getConsumerId(groupName);
+            groupName = RocketMqBoot.getConsumerId(groupName);
             MQPullConsumerScheduleService scheduleService = RocketMqConsumerFactory.getPullConsumer(mapping, groupName);
             scheduleService.registerPullTaskCallback(mapping.getPullTopic().title(), new SechdulePullTask());
         }

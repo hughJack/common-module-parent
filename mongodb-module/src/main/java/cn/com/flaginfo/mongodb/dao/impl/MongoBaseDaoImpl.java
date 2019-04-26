@@ -1,6 +1,6 @@
 package cn.com.flaginfo.mongodb.dao.impl;
 
-import cn.com.flaginfo.module.common.utils.ReflectionUtils;
+import cn.com.flaginfo.module.reflect.ReflectionUtils;
 import cn.com.flaginfo.mongodb.config.MongoDBMultiTemplateRouting;
 import cn.com.flaginfo.mongodb.dao.IMongoBaseDao;
 import cn.com.flaginfo.mongodb.domain.IBaseMongoPO;
@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -52,6 +53,14 @@ public class MongoBaseDaoImpl<T extends IBaseMongoPO> implements IMongoBaseDao<T
     public T insert(T entity) {
         this.getMongoTemplate().insert(entity);
         return entity;
+    }
+
+    @Override
+    public void insertMany(List<T> entityList){
+        if(CollectionUtils.isEmpty(entityList)){
+            return;
+        }
+        this.getMongoTemplate().insertAll(entityList);
     }
 
     @Override

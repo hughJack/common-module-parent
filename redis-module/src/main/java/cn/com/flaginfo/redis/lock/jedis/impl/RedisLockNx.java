@@ -157,6 +157,7 @@ public class RedisLockNx extends AbstractRedisLock {
             }
 
         }
+        locked = false;
         return locked;
     }
 

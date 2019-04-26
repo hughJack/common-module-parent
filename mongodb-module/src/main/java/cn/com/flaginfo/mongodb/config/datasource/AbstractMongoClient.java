@@ -12,8 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.convert.*;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -81,11 +84,24 @@ public abstract class AbstractMongoClient extends MongoDBProperties {
     }
 
     protected MongoTemplate instanceTemplate() throws Exception{
-        MongoTemplate mongoTemplate = new MongoTemplate(this.mongoDbFactory());
+        MongoDbFactory mongoDbFactory = this.mongoDbFactory();
+        MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory, this.mongoConverter(mongoDbFactory));
         this.registerMongoTemplate(mongoTemplate);
         return mongoTemplate;
     }
 
+    protected MongoConverter mongoConverter(MongoDbFactory mongoDbFactory){
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory);
+        MongoCustomConversions conversions = new MongoCustomConversions(Collections.emptyList());
+        MongoMappingContext mappingContext = new MongoMappingContext();
+        mappingContext.setSimpleTypeHolder(conversions.getSimpleTypeHolder());
+        mappingContext.afterPropertiesSet();
+        MappingMongoConverter converter = new MappingMongoConverter(dbRefResolver, mappingContext);
+        converter.setCustomConversions(conversions);
+        converter.afterPropertiesSet();
+        converter.setMapKeyDotReplacement(this.getMapKeyDotReplacement());
+        return converter;
+    }
 
     /**
      * 针对数据源生成数据源实例对象
