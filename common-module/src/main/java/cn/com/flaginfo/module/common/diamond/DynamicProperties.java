@@ -31,6 +31,13 @@ public abstract class DynamicProperties {
 
     private static DynamicProperties dynamicProperties;
 
+    public static DynamicProperties getInstance(){
+        if( null == dynamicProperties ){
+            throw new IllegalStateException("diamond is not instance...");
+        }
+        return dynamicProperties;
+    }
+
     protected final Set<PropertyChangeListener> changeListeners = new HashSet<PropertyChangeListener>();
 
     protected Map<String, Object> preData = new HashMap<>();
@@ -42,6 +49,15 @@ public abstract class DynamicProperties {
      * @return
      */
     public abstract String getProperty(String key);
+
+    /**
+     * 根据属性获取配置值
+     *
+     * @param key
+     * @param defaultValue
+     * @return
+     */
+    public abstract String getProperty(String key, String defaultValue);
 
     /**
      * 获取所有配置

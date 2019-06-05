@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class DefaultRpcSlowlyHandler implements IRpcSlowlyHandle {
-
     /**
      * 成功
      */
@@ -27,47 +26,7 @@ public class DefaultRpcSlowlyHandler implements IRpcSlowlyHandle {
     private static final String FAILED = "Failed";
 
     @Override
-    public void handle(RpcLogInfo rpcLogInfo, RpcConfiguration rpcConfiguration) {
-        if (null == rpcConfiguration
-                || rpcConfiguration.getLogLevel() == RpcConfiguration.RpcLogLevel.Off
-                || null == rpcLogInfo) {
-            return;
-        }
-        switch (rpcConfiguration.getLogLevel()) {
-            case Detailed:
-                this.logDetailed(rpcLogInfo);
-                break;
-            case Detailed_When_Slow:
-                if (rpcLogInfo.getTakeTime() > rpcConfiguration.getSlowThreshold()) {
-                    this.logDetailed(rpcLogInfo);
-                }
-                break;
-            case Succinct_When_Slow:
-                if (rpcLogInfo.getTakeTime() > rpcConfiguration.getSlowThreshold()) {
-                    this.logSuccinct(rpcLogInfo);
-                }
-                break;
-            case Succinct:
-            default:
-                this.logSuccinct(rpcLogInfo);
-                break;
-        }
-        if (rpcLogInfo.getTakeTime() > rpcConfiguration.getSlowThreshold()) {
-            log.warn("Rpc handle rpc is too slow, take {}ms.", rpcLogInfo.getTakeTime());
-        }
-    }
-
-
-    private void logSuccinct(RpcLogInfo rpcLogInfo) {
-        log.info("Rpc called : [{}] [{}] [{}] {} take {}ms",
-                rpcLogInfo.getServiceName(),
-                rpcLogInfo.getInterfaceName(),
-                rpcLogInfo.getMethodName(),
-                rpcLogInfo.isSuccess() ? SUCCESS : FAILED,
-                rpcLogInfo.getTakeTime());
-    }
-
-    private void logDetailed(RpcLogInfo rpcLogInfo) {
+    public void callbackIfConfigureAsDetails(RpcLogInfo rpcLogInfo, RpcConfiguration configuration) {
         log.info("Rpc called : [{}] [{}] [{} {}({})] {} take {}ms",
                 rpcLogInfo.getServiceName(),
                 rpcLogInfo.getInterfaceName(),
@@ -80,4 +39,23 @@ public class DefaultRpcSlowlyHandler implements IRpcSlowlyHandle {
         log.info("Rpc handle response : {}", JSONObject.toJSONString(rpcLogInfo.getResult()));
     }
 
+    @Override
+    public void callbackIfConfigureAsDetailsWhenSlowly(RpcLogInfo rpcLogInfo, RpcConfiguration configuration) {
+        this.callbackIfConfigureAsDetails(rpcLogInfo, configuration);
+    }
+
+    @Override
+    public void callbackIfConfigureAsSuccinct(RpcLogInfo rpcLogInfo, RpcConfiguration configuration) {
+        log.info("Rpc called : [{}] [{}] [{}] {} take {}ms",
+                rpcLogInfo.getServiceName(),
+                rpcLogInfo.getInterfaceName(),
+                rpcLogInfo.getMethodName(),
+                rpcLogInfo.isSuccess() ? SUCCESS : FAILED,
+                rpcLogInfo.getTakeTime());
+    }
+
+    @Override
+    public void callbackIfConfigureAsSuccinctWhenSlowly(RpcLogInfo rpcLogInfo, RpcConfiguration configuration) {
+        this.callbackIfConfigureAsSuccinct(rpcLogInfo, configuration);
+    }
 }

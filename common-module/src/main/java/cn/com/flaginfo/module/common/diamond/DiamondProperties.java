@@ -34,12 +34,11 @@ public class DiamondProperties extends DynamicProperties {
 
     private static PropertiesPropertySource diamondProperties = new PropertiesPropertySource(CONFIG_KEY, new Properties());
 
-
     private DiamondProperties(){
         super();
     }
 
-    public static DynamicProperties initInstance(ConfigurableEnvironment cenv){
+    protected static DynamicProperties init(ConfigurableEnvironment cenv){
         if( log.isDebugEnabled() ){
             log.debug("init Diamond Properties...");
         }
@@ -119,6 +118,16 @@ public class DiamondProperties extends DynamicProperties {
         return null;
     }
 
+    @Override
+    public String getProperty(String key, String defaultVal){
+        try {
+            return env.getProperty(key, defaultVal);
+        } catch (Exception e) {
+            log.error("", e);
+        }
+        return null;
+    }
+
 
     private void updateData(String data){
         preData.clear();
@@ -162,11 +171,13 @@ public class DiamondProperties extends DynamicProperties {
      * @param defVal
      * @return
      */
+    @Deprecated
     public static Integer getPropertyInteger(String s, Integer defVal){
         Integer val = getPropertyInteger(s);
         return null == val ? defVal : val;
     }
 
+    @Deprecated
     public static Integer getPropertyInteger(String s){
         try {
             return Integer.valueOf(getPropertyString(s));
@@ -175,11 +186,13 @@ public class DiamondProperties extends DynamicProperties {
         }
     }
 
+    @Deprecated
     public static Long getPropertyLong(String s, Long defVal){
         Long val = getPropertyLong(s);
         return null == val ? defVal : val;
     }
 
+    @Deprecated
     public static Long getPropertyLong(String s){
         try {
             return Long.valueOf(getPropertyString(s));
@@ -188,11 +201,13 @@ public class DiamondProperties extends DynamicProperties {
         }
     }
 
+    @Deprecated
     public static Double getPropertyDouble(String s, Double defVal){
         Double val = getPropertyDouble(s);
         return null == val ? defVal : val;
     }
 
+    @Deprecated
     public static Double getPropertyDouble(String s){
         try {
             return Double.valueOf(getPropertyString(s));
@@ -201,11 +216,13 @@ public class DiamondProperties extends DynamicProperties {
         }
     }
 
+    @Deprecated
     public static Boolean getPropertyBoolean(String s, Boolean defVal){
         Boolean val = getPropertyBoolean(s);
         return null == val ? defVal : val;
     }
 
+    @Deprecated
     public static Boolean getPropertyBoolean(String s){
         try {
             return Boolean.valueOf(getPropertyString(s));
@@ -214,10 +231,12 @@ public class DiamondProperties extends DynamicProperties {
         }
     }
 
+    @Deprecated
     public static String getPropertyString(String s, String defVal){
         return env.getProperty(s, defVal);
     }
 
+    @Deprecated
     public static String getPropertyString(String s){
         return env.getProperty(s);
     }

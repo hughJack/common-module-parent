@@ -4,10 +4,14 @@ import cn.com.flaginfo.redis.config.selector.RedisDatabaseSelector;
 import cn.com.flaginfo.redis.config.selector.RedisSourceSelector;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisZSetCommands;
 import org.springframework.data.redis.core.*;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -22,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @Time: 2018/10/16 13:59
  */
 @Component
+@DependsOn("redisTemplate")
 public class RedisUtils {
 
     private static RedisUtils redisUtils;
@@ -113,17 +118,6 @@ public class RedisUtils {
     }
 
     /**
-     * 判断指定key的hashKey是否存在
-     *
-     * @param key
-     * @param hashKey
-     * @return
-     */
-    public boolean hasKey(String key, String hashKey) {
-        return hashOperations().hasKey(key, hashKey);
-    }
-
-    /**
      * 设置超时时间
      *
      * @param key
@@ -161,6 +155,18 @@ public class RedisUtils {
      */
     public void delete(Set<String> keys) {
         getTemplate().delete(keys);
+    }
+
+    /**
+     * 模糊删除
+     *
+     * @param pattern
+     */
+    public void deleteByPatter(String pattern) {
+        Set<String> keys = this.keys(pattern);
+        if(!CollectionUtils.isEmpty(keys)){
+            this.delete(keys);
+        }
     }
 
     /**
@@ -233,6 +239,26 @@ public class RedisUtils {
     }
 
     /**
+     * 获取并删除key的值
+     */
+    public Object getAndDelete(String key) {
+        if( this.hasKey(key) ){
+            Object obj = valueOperations().get(key);
+            this.delete(key);
+            return obj;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 获取key的值的类型
+     */
+    public DataType getValueType(String key) {
+        return getTemplate().type(key);
+    }
+
+    /**
      * 获取指定类型的值
      *
      * @param key
@@ -252,6 +278,29 @@ public class RedisUtils {
     //---------------------------------------------------------------------
     // HashOperations -> Redis Redis Hash 操作
     //---------------------------------------------------------------------
+
+    /**
+     * 判断指定key的hashKey是否存在
+     *
+     * @param key
+     * @param hashKey
+     * @return
+     */
+    public boolean hasKey(String key, String hashKey) {
+        return hashOperations().hasKey(key, hashKey);
+    }
+
+
+    /**
+     * 向redis 中添加内容
+     *
+     * @param key     保存key
+     * @param hashKey hashKey
+     * @param data    保存对象 data
+     */
+    public void addHashValue(String key, String hashKey, Object data) {
+        hashOperations().put(key, hashKey, data);
+    }
 
     /**
      * 向redis 中添加内容
@@ -630,13 +679,6 @@ public class RedisUtils {
     }
 
     /**
-     * 获取指定Key对应的set
-     */
-    public Object getSetValue(String key) {
-        return setOperations().members(key);
-    }
-
-    /**
      * 是否包含
      */
     public Long sSize(String key) {
@@ -646,7 +688,7 @@ public class RedisUtils {
     /**
      * 是否包含
      */
-    public Object sIsMember(String key, Object val) {
+    public Boolean sIsMember(String key, Object val) {
         return setOperations().isMember(key, val);
     }
 
@@ -692,9 +734,13 @@ public class RedisUtils {
         }
         StringBuilder builder = new StringBuilder();
         for (Object o : objects) {
+            if( null == o ){
+                continue;
+            }
             builder.append(o.toString()).append(":");
         }
         builder.delete(builder.length() - 1, builder.length());
         return builder.toString();
     }
+
 }

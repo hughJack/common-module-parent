@@ -1,10 +1,10 @@
 package cn.com.flaginfo.redis.cache;
 
 import cn.com.flaginfo.module.common.domain.LocalCache;
-import cn.com.flaginfo.module.reflect.AnnotationResolver;
 import cn.com.flaginfo.redis.RedisUtils;
 import cn.com.flaginfo.redis.lock.jedis.impl.RedisLockNx;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.IllegalClassException;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -16,7 +16,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Redis的解析进程
@@ -35,7 +36,15 @@ public class RedisCachePointProcessor {
 
     private final Object[] lock = new Object[0];
 
+    private final Object[] formatterLock = new Object[0];
+
     private static final String DistributedLock = "DistributedLock";
+
+    private static final Map<Class<? extends IRedisCacheKeyFormatter>, IRedisCacheKeyFormatter> FORMATTER_CACHE = new HashMap<>();
+
+    static {
+        FORMATTER_CACHE.put(RedisCacheKeyDefaultFormatter.class, new RedisCacheKeyDefaultFormatter());
+    }
 
     @Pointcut("@annotation(cn.com.flaginfo.redis.cache.RedisCache)")
     private void annotationPoint() {
@@ -267,7 +276,7 @@ public class RedisCachePointProcessor {
      */
     private void cache2LocalCache(String cacheKey, RedisCache redisCache, Object obj) {
         try {
-            if (null != obj ) {
+            if (null != obj) {
                 LocalCache localCache = this.getLocalCacheOps(redisCache);
                 if (null != localCache) {
                     localCache.put(cacheKey, obj);
@@ -372,8 +381,6 @@ public class RedisCachePointProcessor {
         return AnnotationUtils.findAnnotation(method, RedisCache.class);
     }
 
-    private static final String PATTERN = ".*\\{+.*\\}+.*";
-
     /**
      * 生成缓存Key
      *
@@ -382,10 +389,35 @@ public class RedisCachePointProcessor {
      * @return
      */
     private String generateCacheKey(RedisCache cache, ProceedingJoinPoint point) {
-        if (!Pattern.matches(PATTERN, cache.cacheKey())) {
-            return cache.cacheKey();
-        }
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
-        return AnnotationResolver.resolver(cache.cacheKey(), methodSignature.getParameterNames(), point.getArgs());
+        return this.getFormatterClass(cache.cacheKeyFormatter()).formatter(cache, methodSignature.getParameterNames(), point.getArgs(), methodSignature.getMethod().getReturnType());
+    }
+
+    /**
+     * 获取处理函数
+     *
+     * @param formatterClass
+     * @return
+     */
+    private IRedisCacheKeyFormatter getFormatterClass(Class<? extends IRedisCacheKeyFormatter> formatterClass) {
+        if (!FORMATTER_CACHE.containsKey(formatterClass)) {
+            synchronized (formatterLock) {
+                if (!FORMATTER_CACHE.containsKey(formatterClass)) {
+                    IRedisCacheKeyFormatter redisCacheKeyFormatter = null;
+                    try {
+                        redisCacheKeyFormatter = formatterClass.newInstance();
+                    } catch (Exception e) {
+                      throw new IllegalClassException("cannot instance formatter class which one : " + formatterClass.getName());
+                    }
+                    FORMATTER_CACHE.put(formatterClass, redisCacheKeyFormatter);
+                    return redisCacheKeyFormatter;
+                }
+            }
+        }
+        return FORMATTER_CACHE.get(formatterClass);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(RedisCachePointProcessor.class.getName());
     }
 }

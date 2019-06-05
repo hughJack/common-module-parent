@@ -11,9 +11,30 @@ import cn.com.flaginfo.rpc.common.domain.RpcLogInfo;
 public interface IRpcSlowlyHandle {
 
     /**
-     * 回调执行器，当日志关闭时，rpcLogInfo为空
+     * 当设置为详细日志时的回调
      * @param rpcLogInfo
-     * @param rpcConfiguration
+     * @param configuration
      */
-    void handle(RpcLogInfo rpcLogInfo, RpcConfiguration rpcConfiguration);
+    void callbackIfConfigureAsDetails(RpcLogInfo rpcLogInfo, RpcConfiguration configuration);
+
+    /**
+     * 当设置为慢查询记录详细日志时的回调
+     * @param rpcLogInfo
+     * @param configuration
+     */
+    void callbackIfConfigureAsDetailsWhenSlowly(RpcLogInfo rpcLogInfo, RpcConfiguration configuration);
+
+    /**
+     * 当设置为简洁日志时的回调
+     * @param rpcLogInfo
+     * @param configuration
+     */
+    void callbackIfConfigureAsSuccinct(RpcLogInfo rpcLogInfo, RpcConfiguration configuration);
+
+    /**
+     * 当设置为慢查询时记录简洁日志时的回调
+     * @param rpcLogInfo
+     * @param configuration
+     */
+    void callbackIfConfigureAsSuccinctWhenSlowly(RpcLogInfo rpcLogInfo, RpcConfiguration configuration);
 }

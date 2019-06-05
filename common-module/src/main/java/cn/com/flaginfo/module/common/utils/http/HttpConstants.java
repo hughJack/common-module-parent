@@ -8,7 +8,10 @@ public interface HttpConstants {
 
     String UTF_8 = "utf-8";
 
+    String HTTP_PROTOCOL = "http://";
+
     String PROTOCOL_HTTP = "http";
+
     int DEFAULT_HTTPS_PORT = 443;
     String DEFAULT_HTTPS_PORT_STRING = "443";
 
@@ -61,6 +64,7 @@ public interface HttpConstants {
     String QP_SEP_C = ":";
     String QP_SEP_P = "?";
     String QP_SEP_S = "/";
+    String QP_SEP_CSS = "://";
 
     String NAME_VALUE_SEPARATOR = "=";
 }

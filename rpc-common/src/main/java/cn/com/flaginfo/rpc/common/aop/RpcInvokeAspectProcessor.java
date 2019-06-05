@@ -139,8 +139,35 @@ public class RpcInvokeAspectProcessor {
     }
 
     private void doCallBack(RpcLogInfo.RpcLogInfoBuilder rpcLogInfoBuilder, RpcConfiguration rpcConfiguration) {
+        RpcLogInfo rpcLogInfo = null == rpcLogInfoBuilder ? null : rpcLogInfoBuilder.build();
+        if (null == rpcConfiguration
+                || rpcConfiguration.getLogLevel() == RpcConfiguration.RpcLogLevel.Off
+                || null == rpcLogInfo) {
+            return;
+        }
         if (null != rpcSlowlyHandle) {
-            rpcSlowlyHandle.handle(null == rpcLogInfoBuilder ? null : rpcLogInfoBuilder.build(), rpcConfiguration);
+            switch (rpcConfiguration.getLogLevel()) {
+                case Detailed:
+                    rpcSlowlyHandle.callbackIfConfigureAsDetails(rpcLogInfo, rpcConfiguration);
+                    break;
+                case Detailed_When_Slow:
+                    if (rpcLogInfo.getTakeTime() > rpcConfiguration.getSlowThreshold()) {
+                        rpcSlowlyHandle.callbackIfConfigureAsDetailsWhenSlowly(rpcLogInfo, rpcConfiguration);
+                    }
+                    break;
+                case Succinct_When_Slow:
+                    if (rpcLogInfo.getTakeTime() > rpcConfiguration.getSlowThreshold()) {
+                        rpcSlowlyHandle.callbackIfConfigureAsSuccinctWhenSlowly(rpcLogInfo, rpcConfiguration);
+                    }
+                    break;
+                case Succinct:
+                    rpcSlowlyHandle.callbackIfConfigureAsSuccinct(rpcLogInfo, rpcConfiguration);
+                default:
+                    break;
+            }
+        }
+        if (rpcLogInfo.getTakeTime() > rpcConfiguration.getSlowThreshold()) {
+            log.warn("Rpc handle rpc is too slow, take {}ms.", rpcLogInfo.getTakeTime());
         }
     }
 }

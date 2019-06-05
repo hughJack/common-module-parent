@@ -79,7 +79,10 @@ public class RocketMqAutoConfiguration implements ApplicationListener<ContextRef
 
     private void startMqContext() {
         log.info("start init MQ context...");
-        final String basePackage = DiamondProperties.getPropertyString("mq.scan.base-package");
+        String basePackage = null;
+        try {
+            basePackage = DiamondProperties.getPropertyString("mq.scan.base-package");
+        }catch (Exception e){}
         try {
             List<Class<?>> classList = ClassScannerUtils.scanner(basePackage);
             MqConsumerLoader.getInstance().loadPushConsumerActionWithClass(classList);
@@ -98,7 +101,7 @@ public class RocketMqAutoConfiguration implements ApplicationListener<ContextRef
                     throw new MqRuntimeException("unknown ma type.");
             }
         } catch (Exception e) {
-            log.error("", e);
+            throw new MqRuntimeException(e);
         }
     }
 

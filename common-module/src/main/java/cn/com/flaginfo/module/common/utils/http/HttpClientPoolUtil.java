@@ -2,6 +2,9 @@ package cn.com.flaginfo.module.common.utils.http;
 
 import cn.com.flaginfo.module.common.domain.config.HttpClientPoolConfig;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.*;
@@ -135,15 +138,13 @@ public class HttpClientPoolUtil {
      * @return
      */
     public CloseableHttpClient createHttpClient(String url) {
-        int port = HttpConstants.DEFAULT_HTTP_PORT;
-        if (url.contains(HttpConstants.PROTOCOL_HTTPS)) {
-            port = HttpConstants.DEFAULT_HTTPS_PORT;
+        UrlUtils.Url urlInfo = UrlUtils.parse(url);
+        if( !urlInfo.isUrl() ){
+            url = HttpConstants.HTTP_PROTOCOL + url;
+            urlInfo = UrlUtils.parse(url);
         }
-        String host = url.split(HttpConstants.QP_SEP_S)[2];
-        if (host.contains(HttpConstants.QP_SEP_C)) {
-            String[] args = host.split(HttpConstants.QP_SEP_C);
-            host = args[0];
-            port = Integer.parseInt(args[1]);
+        if( !urlInfo.isUrl() ){
+            throw new IllegalArgumentException("url formatter error : " + url);
         }
         ConnectionSocketFactory plainSocketFactory = PlainConnectionSocketFactory.getSocketFactory();
         LayeredConnectionSocketFactory sslSocketFactory = SSLConnectionSocketFactory.getSocketFactory();
@@ -155,7 +156,7 @@ public class HttpClientPoolUtil {
         manager = new PoolingHttpClientConnectionManager(registry);
         manager.setMaxTotal(config.getMaxPoolSize());
         manager.setDefaultMaxPerRoute(config.getMaxPreRout());
-        HttpHost httpHost = new HttpHost(host, port);
+        HttpHost httpHost = new HttpHost(urlInfo.getHost(), urlInfo.getPort());
         manager.setMaxPerRoute(new HttpRoute(httpHost), config.getMaxPreRout());
         HttpRequestRetryHandler retryHandler = (e, i, httpContext) -> {
             if (i > config.getRetryTimes()) {
@@ -277,7 +278,7 @@ public class HttpClientPoolUtil {
      * @param url
      * @return
      */
-    public String get(String url) {
+    public Response get(String url) {
         return this.get(url, null);
     }
 
@@ -288,7 +289,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String get(String url, Map<String, String> params) {
+    public Response get(String url, Map<String, String> params) {
         return this.get(url, null, params);
     }
 
@@ -299,7 +300,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String get(String url, Map<String, String> header, Map<String, String> params) {
+    public Response get(String url, Map<String, String> header, Map<String, String> params) {
         url = HttpParamsUtils.appendUrlParams(url, params);
         return this.sampleRequest(RequestMethod.GET, url, header);
     }
@@ -312,7 +313,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String post(String url, Map<String, String> params) {
+    public Response post(String url, Map<String, String> params) {
         return this.post(url, null, params);
     }
 
@@ -324,7 +325,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String post(String url, Map<String, String> header, Map<String, String> params) {
+    public Response post(String url, Map<String, String> header, Map<String, String> params) {
         return this.sampleRequest(RequestMethod.POST, url, header, params);
     }
 
@@ -336,7 +337,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String post(String url, String params) {
+    public Response post(String url, String params) {
         return this.post(url, null, params);
     }
 
@@ -348,7 +349,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String post(String url, Map<String, String> header, String params) {
+    public Response post(String url, Map<String, String> header, String params) {
         return this.sampleRequest(RequestMethod.POST, url, header, params);
     }
 
@@ -359,7 +360,7 @@ public class HttpClientPoolUtil {
      * @param url
      * @return
      */
-    public String sampleRequest(RequestMethod method, String url) {
+    public Response sampleRequest(RequestMethod method, String url) {
         return this.sampleRequest(method, url, null);
     }
 
@@ -371,7 +372,7 @@ public class HttpClientPoolUtil {
      * @param header
      * @return
      */
-    public String sampleRequest(RequestMethod method, String url, Map<String, String> header) {
+    public Response sampleRequest(RequestMethod method, String url, Map<String, String> header) {
         return this.sampleRequest(method, url, null, Collections.emptyMap());
     }
 
@@ -384,7 +385,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String sampleRequest(RequestMethod method, String url, Map<String, String> header, Map<String, String> params) {
+    public Response sampleRequest(RequestMethod method, String url, Map<String, String> header, Map<String, String> params) {
         HttpRequestBase request = this.createRequest(method, url);
         if (CollectionUtils.isEmpty(params)) {
             return this.doRequest(url, request, header);
@@ -402,7 +403,7 @@ public class HttpClientPoolUtil {
      * @param params
      * @return
      */
-    public String sampleRequest(RequestMethod method, String url, Map<String, String> header, String params) {
+    public Response sampleRequest(RequestMethod method, String url, Map<String, String> header, String params) {
         HttpRequestBase request = this.createRequest(method, url);
         if (null == header) {
             header = new HashMap<>(2);
@@ -412,7 +413,7 @@ public class HttpClientPoolUtil {
         return this.doRequest(url, request, header);
     }
 
-    private String doRequest(String url, HttpRequestBase request, Map<String, String> header) {
+    private Response doRequest(String url, HttpRequestBase request, Map<String, String> header) {
         CloseableHttpResponse response = null;
         try {
             this.setupRequestConfig(request);
@@ -424,14 +425,10 @@ public class HttpClientPoolUtil {
                 log.error("http client request no response : {}", url);
                 return null;
             }
-            if (responseState.getStatusCode() != HttpStatus.SC_OK) {
-                log.error("http client response error, response code:{}, url:{}", responseState.getStatusCode(), url);
-                return null;
-            }
             HttpEntity entity = response.getEntity();
             String result = EntityUtils.toString(entity, Consts.UTF_8);
             EntityUtils.consume(entity);
-            return result;
+            return Response.builder().statusCode(responseState.getStatusCode()).body(result).build();
         } catch (IOException e) {
             log.error("http request error:{}", url, e);
         } finally {
@@ -493,5 +490,28 @@ public class HttpClientPoolUtil {
                 throw new IllegalArgumentException("Unexpected method : " + requestMethod);
         }
         return request;
+    }
+
+    @Getter
+    @ToString
+    @Builder
+    public static class Response{
+        /**
+         * 响应状态码，该参数为Http协议状态
+         */
+        private int statusCode;
+
+        /**
+         * 响应内容
+         */
+        private String body;
+
+        public <T> T getBody(Class<T> tClass){
+            if( StringUtils.isBlank(body) ){
+                return null;
+            }else{
+                return JSONObject.parseObject(body, tClass);
+            }
+        }
     }
 }

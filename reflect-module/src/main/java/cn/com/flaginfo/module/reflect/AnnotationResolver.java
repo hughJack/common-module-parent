@@ -21,9 +21,15 @@ import java.util.regex.Pattern;
 @Slf4j
 public class AnnotationResolver {
 
+    private static final String NULL_STRING = "null";
+
     private static Pattern PATTERN = Pattern.compile("(#\\{([^\\}]+)\\})");
 
     private static final Pattern TO_JSON_PATTERN = Pattern.compile("(^toJSON\\(([^\\}]+)\\))");
+
+    public static String resolver(String str, String[] names, Object[] args) {
+        return resolver(str, names, args, NULL_STRING);
+    }
 
     /**
      * 解析注解上的值
@@ -31,9 +37,10 @@ public class AnnotationResolver {
      * @param names 参数名称
      * @param args  参数值
      * @param str   需要解析的字符串
+     * @param nullReplace null对象的替代者
      * @return
      */
-    public static String resolver(String str, String[] names, Object[] args) {
+    public static String resolver(String str, String[] names, Object[] args, String nullReplace) {
         if (str == null) {
             return null;
         }
@@ -59,7 +66,15 @@ public class AnnotationResolver {
             } else {
                 value = simpleResolver(sParseStr, names, args);
             }
-            String replacement = toJson ? JSONObject.toJSONString(value) : String.valueOf(value);
+            String replacement;
+            if( null == value ){
+                replacement = nullReplace;
+            }else{
+                replacement = toJson ? JSONObject.toJSONString(value) : String.valueOf(value);
+            }
+            if( StringUtils.isBlank(replacement) ){
+                replacement = nullReplace;
+            }
             str = str.replaceAll("(#\\{" + fParseStr + "\\})", Matcher.quoteReplacement(replacement));
         }
         return str;

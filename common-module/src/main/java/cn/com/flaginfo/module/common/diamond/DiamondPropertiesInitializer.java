@@ -18,6 +18,6 @@ public class DiamondPropertiesInitializer implements ApplicationContextInitializ
 
     @Override
     public void initialize(ConfigurableApplicationContext applicationContext) {
-        DiamondProperties.initInstance(applicationContext.getEnvironment());
+        DiamondProperties.init(applicationContext.getEnvironment());
     }
 }

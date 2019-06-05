@@ -1,7 +1,5 @@
 package cn.com.flaginfo.redis.cache;
 
-import net.bytebuddy.implementation.bind.annotation.RuntimeType;
-
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +27,7 @@ public @interface RedisCache {
 
     /**
      * 缓存的key
-     * 支持预编译符，例如: Cache:#{0}:#{memberId}:#{authInfo.id}
+     * 默认处理器支持预编译符，例如: Cache:#{0}:#{memberId}:#{authInfo.id}
      * #{0}表示第0个参数，后面的依次类推
      * #{memberId}表示参数名称为memberId的参数
      * #{authInfo.id}表示参数名为authInfo的对象的id属性
@@ -37,6 +35,17 @@ public @interface RedisCache {
      */
     String cacheKey();
 
+    /**
+     * 缓存key格式话处理类
+     * @return
+     */
+    Class<? extends IRedisCacheKeyFormatter> cacheKeyFormatter() default RedisCacheKeyDefaultFormatter.class;
+
+    /**
+     * 替换key中的null
+     * @return
+     */
+    String replaceNull() default "null";
 
     /**
      * 是否使用单线程加载

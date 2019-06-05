@@ -6,6 +6,8 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.UUID;
+
 /**
  * @author: Meng.Liu
  * @date: 2018/11/22 上午11:43
@@ -16,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "spring.mq.rocket")
 public class RocketMqConfig {
+
+    private static String DEFAULT_PRODUCER_GROUP = "Producer_" + UUID.randomUUID().toString().replaceAll("-", "");
 
     /**
      * 服务器地址
@@ -50,4 +54,11 @@ public class RocketMqConfig {
      */
     private Boolean vipChannelEnabled = true;
 
+    public String getProducerGroup() {
+        if (null == producerGroup) {
+            return DEFAULT_PRODUCER_GROUP;
+        } else {
+            return producerGroup;
+        }
+    }
 }
